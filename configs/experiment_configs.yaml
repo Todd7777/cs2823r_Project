@@ -1,0 +1,98 @@
+# CIB-Med-1 Experiment Configurations
+# ====================================
+# Pre-defined configurations for reproducing paper experiments
+
+# Main comparison experiment (Section 5)
+main_comparison:
+  name: "main_comparison"
+  description: "Compare constrained vs unconstrained guidance"
+  methods:
+    - name: "unconstrained"
+      type: "unconstrained_guidance"
+      params:
+        guidance_scale: 7.5
+    - name: "constrained_lambda_0.5"
+      type: "constrained_guidance"
+      params:
+        lambda_constraint: 0.5
+    - name: "constrained_lambda_1.0"
+      type: "constrained_guidance"
+      params:
+        lambda_constraint: 1.0
+    - name: "constrained_lambda_2.0"
+      type: "constrained_guidance"
+      params:
+        lambda_constraint: 2.0
+  anchors:
+    num_anchors: 100
+    stratified: true
+  trajectory:
+    num_steps: 20
+  metrics:
+    - trend_correlation
+    - inversion_rate
+    - aggregate_drift
+    - per_label_drift
+
+# Pareto frontier sweep (Section 5.3)
+pareto_sweep:
+  name: "pareto_sweep"
+  description: "Sweep constraint strength for Pareto analysis"
+  lambda_values: [0.0, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 5.0, 10.0]
+  anchors:
+    num_anchors: 50
+  trajectory:
+    num_steps: 20
+
+# Ablation study (Section 5.4)
+ablation_study:
+  name: "ablation_study"
+  description: "Leave-one-out and grouped ablations"
+  base_config:
+    lambda_constraint: 1.0
+  ablation_types:
+    - leave_one_out
+    - grouped
+    - weight_ablation
+  anchors:
+    num_anchors: 30
+
+# Correlation analysis (Section 6)
+correlation_analysis:
+  name: "correlation_analysis"
+  description: "Analyze drift vs dataset association"
+  compute_associations: true
+  correlation_method: "spearman"
+  anchors:
+    num_anchors: 200
+  methods:
+    - unconstrained
+    - constrained_lambda_1.0
+
+# Synthetic stress tests (Section 7)
+synthetic_tests:
+  name: "synthetic_tests"
+  description: "Synthetic and semi-synthetic validation"
+  semi_synthetic:
+    enabled: true
+    perturbation_locations:
+      - upper_lobe
+      - lower_lobe
+      - cardiac
+    gammas: [0.0, 0.05, 0.1, 0.15, 0.2]
+  synthetic_latent:
+    enabled: true
+    coupling_rhos: [0.0, 0.3, 0.5, 0.7, 1.0]
+    num_trajectories: 50
+
+# Human validation experiment (Section 5.5)
+human_validation:
+  name: "human_validation"
+  description: "Generate trajectories for radiologist evaluation"
+  num_trajectories: 30
+  methods:
+    - unconstrained
+    - constrained_lambda_1.0
+    - pix2pix
+  save_format: "png"
+  anonymize: true

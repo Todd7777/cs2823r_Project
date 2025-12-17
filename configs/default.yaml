@@ -1,0 +1,150 @@
+# CIB-Med-1 Default Configuration
+# ================================
+# This configuration file contains all default settings for running
+# the CIB-Med-1 benchmark as described in the NeurIPS paper.
+
+# Data paths - Update these to your local data directories
+data:
+  root_dir: "/Users/ttt/Downloads/cxr_data"
+  mimic_cxr_dir: "/Users/ttt/Downloads/mimic-cxr"
+  chexpert_dir: "/Users/ttt/Downloads/chexpert"
+  output_dir: "/Users/ttt/Downloads/cib_med_outputs"
+  cache_dir: "/Users/ttt/Downloads/cib_med_cache"
+
+# Evaluator configuration
+evaluator:
+  model_type: "densenet121"  # densenet121, resnet50, ensemble
+  weights_path: null  # Path to pretrained weights, null for default
+  image_size: [224, 224]
+  num_labels: 14
+  device: "auto"  # auto, cuda, cpu, mps
+
+# Semantic coordinate system
+coordinates:
+  target_finding: "Pleural Effusion"
+  off_target_findings:
+    - "Atelectasis"
+    - "Consolidation"
+    - "Pneumonia"
+    - "Edema"
+    - "Lung Opacity"
+    - "Cardiomegaly"
+    - "Enlarged Cardiomediastinum"
+    - "Pneumothorax"
+    - "Pleural Thickening"
+    - "Pleural Other"
+    - "Fibrosis"
+    - "Emphysema"
+    - "Support Devices"
+    - "Fracture"
+
+# Calibration settings
+calibration:
+  method: "isotonic"  # isotonic, platt
+  validation_split: 0.2
+  save_path: null
+
+# Anchor selection criteria
+anchors:
+  num_anchors: 100
+  target_range: [0.1, 0.9]  # p_eff range for valid anchors
+  min_off_target_variance: 0.01
+  stratify_by_target: true
+  random_seed: 42
+
+# Trajectory generation
+trajectory:
+  num_steps: 20
+  noise_level: 0.3
+  guidance_scale: 7.5
+  save_intermediate: true
+  save_images: true
+
+# Constrained guidance settings (Section 4)
+constrained_guidance:
+  lambda_constraint: 1.0  # Constraint strength
+  alpha_variance: 0.5  # Variance weight in w_k
+  beta_anchor: 0.3  # Anchor value weight in w_k
+  barrier_type: "signed"  # signed, squared
+  dynamic_adjustment: true
+
+# Unconstrained guidance settings (baseline)
+unconstrained_guidance:
+  guidance_scale: 7.5
+  clip_guidance: false
+  clip_percentile: 0.99
+
+# Diffusion model settings
+diffusion:
+  model_config: "medium"  # small, medium, large
+  num_inference_steps: 50
+  scheduler: "ddpm"  # ddpm, ddim
+  beta_schedule: "linear"  # linear, cosine
+  beta_start: 0.0001
+  beta_end: 0.02
+
+# Metrics configuration
+metrics:
+  compute_trend_correlation: true
+  compute_inversion_rate: true
+  compute_per_label_drift: true
+  compute_aggregate_drift: true
+  drift_percentiles: [0.5, 0.9, 0.95]
+
+# Ablation study settings
+ablation:
+  run_leave_one_out: true
+  run_grouped: true
+  run_weight_ablation: true
+  finding_groups:
+    parenchymal:
+      - "Atelectasis"
+      - "Consolidation"
+      - "Pneumonia"
+      - "Edema"
+      - "Lung Opacity"
+    cardiomediastinal:
+      - "Cardiomegaly"
+      - "Enlarged Cardiomediastinum"
+    pleural:
+      - "Pneumothorax"
+      - "Pleural Thickening"
+      - "Pleural Other"
+    chronic:
+      - "Fibrosis"
+      - "Emphysema"
+    artifact:
+      - "Support Devices"
+      - "Fracture"
+
+# Synthetic stress tests (Section 7)
+stress_tests:
+  run_semi_synthetic: true
+  run_synthetic_latent: true
+  perturbation_gammas: [0.0, 0.05, 0.1, 0.15, 0.2]
+  coupling_rhos: [0.0, 0.3, 0.5, 0.7, 1.0]
+  constraint_lambdas: [0.0, 0.5, 1.0, 2.0, 5.0]
+
+# Visualization settings
+visualization:
+  save_figures: true
+  figure_format: "pdf"  # pdf, png, svg
+  figure_dpi: 300
+  style: "paper"  # paper, presentation
+  color_palette: "colorblind"
+
+# Logging and reproducibility
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  log_file: null
+  tensorboard: false
+
+reproducibility:
+  seed: 42
+  deterministic: true
+
+# Experiment settings
+experiment:
+  name: "cib_med_default"
+  description: "Default CIB-Med-1 benchmark run"
+  tags: []
