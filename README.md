@@ -17,7 +17,7 @@ CIB-Med-1 addresses this by providing:
 - **Off-Target Drift Detection**: Quantify deviations along non-target clinical axes
 - **Constrained Diffusion Guidance**: A method that optimizes target progression subject to bounded off-target change
 
-### Key Findings
+### Key Findings (preliminary, results presented on paper we re-run with more hyperparamters and ablations)
 
 | Method | Target Progression ↑ | Off-Target Drift ↓ | Human Correlation (τ) |
 |--------|---------------------|-------------------|----------------------|
